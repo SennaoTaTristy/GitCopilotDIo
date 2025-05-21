@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Identificador de Bandeira do Cartão</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      text-align: center;
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #resultado {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+      color: #333;
+      min-height: 30px;
+    }
+    #bandeiraImg {
+      margin-top: 15px;
+      max-width: 120px;
+      height: auto;
+      display: none; /* escondida inicialmente */
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Identificador de Bandeira do Cartão</h2>
+  <label for="numeroCartao">Digite o número do cartão:</label>
+  <input type="text" id="numeroCartao" placeholder="Ex: 4111 1111 1111 1111" />
+  <button onclick="identificarBandeira()">Identificar</button>
+
+  <div id="resultado"></div>
+  <img id="bandeiraImg" alt="Ícone da bandeira" />
+
+  <script>
+    function identificarBandeira() {
+      const input = document.getElementById('numeroCartao').value;
+      const numeroLimpo = input.replace(/\D/g, '');
+      const comprimento = numeroLimpo.length;
+      const resultado = document.getElementById('resultado');
+      const bandeiraImg = document.getElementById('bandeiraImg');
+
+      bandeiraImg.style.display = 'none'; // esconde imagem por padrão
+      bandeiraImg.src = '';
+      resultado.textContent = '';
+
+      if (numeroLimpo.length === 0) {
+        resultado.textContent = 'Por favor, digite um número válido.';
+        return;
+      }
+
+      let bandeira = null;
+
+      if (numeroLimpo.startsWith('4') && (comprimento === 13 || comprimento === 16 || comprimento === 19)) {
+        bandeira = 'Visa';
+      } else if (
+        comprimento === 16 &&
+        (
+          (parseInt(numeroLimpo.substring(0, 2)) >= 51 && parseInt(numeroLimpo.substring(0, 2)) <= 55) ||
+          (parseInt(numeroLimpo.substring(0, 4)) >= 2221 && parseInt(numeroLimpo.substring(0, 4)) <= 2720)
+        )
+      ) {
+        bandeira = 'MasterCard';
+      } else if (comprimento === 15 && (numeroLimpo.startsWith('34') || numeroLimpo.startsWith('37'))) {
+        bandeira = 'American Express';
+      } else if (
+        comprimento === 16 &&
+        (
+          numeroLimpo.startsWith('6011') ||
+          numeroLimpo.startsWith('65') ||
+          (parseInt(numeroLimpo.substring(0, 3)) >= 644 && parseInt(numeroLimpo.substring(0, 3)) <= 649)
+        )
+      ) {
+        bandeira = 'Discover';
+      } 
+
+      if (bandeira) {
+        resultado.textContent = `Bandeira detectada: ${bandeira}`;
+        // Mapeamento da bandeira para a imagem (links públicos)
+        const imagens = {
+          'Visa': 'https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png',
+          'MasterCard': 'https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png',
+          'American Express': 'https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo_%282018%29.svg',
+          'Discover': 'https://upload.wikimedia.org/wikipedia/commons/5/53/Discover_Card_logo.svg'
+        };
+
+        bandeiraImg.src = imagens[bandeira];
+        bandeiraImg.style.display = 'inline-block';
+      } else {
+        resultado.textContent = 'Bandeira não identificada ou cartão inválido.';
+      }
+    }
+  </script>
+
+</body>
+</html>
